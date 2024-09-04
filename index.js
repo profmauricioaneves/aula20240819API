@@ -114,6 +114,58 @@ app.get('/calculate', (req, res, next) => {
     }
 });
 
+app.get('/imc', (req, res, next) => {
+    try {
+        const { peso, altura} = req.query;
+
+        
+        // Verifica o valor do parâmetro 'operation' recebido
+        console.log(`Received altura: '${altura}'`);
+        console.log(`Received peso: '${peso}'`);
+
+        // Verifica se todos os parâmetros estão presentes
+        if (altura === undefined || peso === undefined) {
+            throw new Error('Parâmetros insuficientes!');
+        }
+
+        // Converte os parâmetros para números
+        const pesoNumber = parseFloat(peso);
+        const alturaNumber = parseFloat(altura/100);
+
+        // Verifica se os parâmetros são números válidos
+        if (isNaN(pesoNumber) || isNaN(alturaNumber)) {
+            throw new Error('Parâmetros inválidos!');
+        }
+
+        let imc = pesoNumber / (alturaNumber * alturaNumber);
+        let result;
+
+        // retornando o imc para a consulta
+
+if (imc < 16) {
+result = `${imc} - Magreza grave`;
+} else if(imc >= 16 && imc <16.9) {
+    result = `${imc} - Magreza Moderada`;
+} else if (imc >= 17 && imc < 18.5) {
+    result = `${imc} - Magreza Leve`; 
+} else if (imc >= 18.5 && imc < 24.9) {
+    result = `${imc} - Peso Ideal`; 
+} else if (imc >= 24.9 && imc < 29.9) {
+    result = `${imc} - sobrepeso`; 
+} else if (imc >= 29.9 && imc < 34.9) {
+    result = `${imc} - Obesidade Grau I`; 
+} else if (imc >= 34.9 && imc < 39.9) {
+    result = `${imc} - Obesidade Grau II ou Severa`; 
+} else {
+    result = `${imc} - Obesidade Grau III ou Mórbida`;    
+}
+
+        res.json({ result });
+    } catch (error) {
+        next(error); // Passa o erro para o middleware de tratamento
+    }
+});
+
 // Middleware de tratamento de erros
 app.use((err, req, res, next) => {
     console.error(err.stack); // Log do erro
